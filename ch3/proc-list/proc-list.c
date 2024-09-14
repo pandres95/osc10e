@@ -26,7 +26,8 @@ static int mod_init(void)
 
   for_each_process(task)
   {
-    printk(KERN_INFO "[[proc-list]] command = [%s] state = [%ld] pid = [%d]\n", task->comm, task->state, task->pid);
+    printk(KERN_INFO "[[proc-list]] command = [%s] state = [%ld] ppid = [%d] pid = [%d]\n",
+           task->comm, task->state, task->parent->pid, task->pid);
   }
 
   return 0;

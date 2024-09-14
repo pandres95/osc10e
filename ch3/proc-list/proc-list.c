@@ -32,8 +32,15 @@ static int mod_init(void)
   return 0;
 }
 
+/* This function is called when the module is removed. */
+static void mod_exit(void)
+{
+  printk(KERN_INFO "[[proc-list]] Goodbye\n");
+}
+
 /* Macros for registering module entry and exit points. */
 module_init(mod_init);
+module_exit(mod_exit);
 
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("proc-list");

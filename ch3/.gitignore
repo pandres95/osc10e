@@ -1,0 +1,9 @@
+*.cmd
+*.ko
+*.mod*
+*.o
+
+Module.symvers
+modules.order
+
+simple-shell/simple-shell

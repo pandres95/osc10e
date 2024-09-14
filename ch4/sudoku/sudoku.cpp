@@ -17,6 +17,7 @@ typedef struct
   int (*board)[9];
 } parameters;
 int result[num_threads] = {0};
+
 void *check_grid(void *params);
 void *check_rows(void *params);
 void *check_cols(void *params);
@@ -26,26 +27,34 @@ int main(void)
 {
   int sudoku[9][9] =
       {
-          {6, 2, 4, 5, 3, 9, 1, 8, 7},
-          {5, 1, 9, 7, 2, 8, 6, 3, 4},
-          {8, 3, 7, 6, 1, 4, 2, 9, 5},
-          {1, 4, 3, 8, 6, 5, 7, 2, 9},
-          {9, 5, 8, 2, 4, 7, 3, 6, 1},
-          {7, 6, 2, 3, 9, 1, 4, 5, 8},
-          {3, 7, 1, 9, 5, 6, 8, 4, 2},
-          {4, 9, 6, 1, 8, 2, 5, 7, 3},
-          {2, 8, 5, 4, 7, 3, 9, 1, 6}};
+          {6, 2, 4, /**/ 5, 3, 9, /**/ 1, 8, 7},
+          {5, 1, 9, /**/ 7, 2, 8, /**/ 6, 3, 4},
+          {8, 3, 7, /**/ 6, 1, 4, /**/ 2, 9, 5},
+
+          {1, 4, 3, /**/ 8, 6, 5, /**/ 7, 2, 9},
+          {9, 5, 8, /**/ 2, 4, 7, /**/ 3, 6, 1},
+          {7, 6, 2, /**/ 3, 9, 1, /**/ 4, 5, 8},
+
+          {3, 7, 1, /**/ 9, 5, 6, /**/ 8, 4, 2},
+          {4, 9, 6, /**/ 1, 8, 2, /**/ 5, 7, 3},
+          {2, 8, 5, /**/ 4, 7, 3, /**/ 9, 1, 6}};
+
   steady_clock::time_point start_time_single_thread = steady_clock::now();
+
   if (sudoku_checker(sudoku))
     printf("Con un solo hilo: Solución INCORRECTA del sudoku\n");
   else
     printf("Con un solo hilo: Solución CORRECTA del sudoku\n");
+
   steady_clock::time_point end_time_single_thread = steady_clock::now();
   duration<double> elapsed_time_single_thread = duration_cast<duration<double>>(end_time_single_thread - start_time_single_thread);
+
   cout << endl
        << "Tiempo total usando un solo hilo: " << elapsed_time_single_thread.count() << " segundos" << endl
        << endl;
+
   steady_clock::time_point start_time_threads = steady_clock::now();
+
   pthread_t threads[num_threads];
   int threadIndex = 0;
   for (int i = 0; i < 9; i++)
@@ -78,6 +87,7 @@ int main(void)
       }
     }
   }
+
   for (int i = 0; i < num_threads; i++)
     pthread_join(threads[i], NULL);
   for (int i = 0; i < num_threads; i++)
@@ -92,12 +102,14 @@ int main(void)
       return 1;
     }
   }
+
   cout << "Con varios hilos: Solución CORRECTA del sudoku" << endl;
   steady_clock::time_point end_time_threads = steady_clock::now();
   duration<double> elapsed_time_threads = duration_cast<duration<double>>(end_time_threads - start_time_threads);
   cout << endl
        << "Tiempo total utilizando 27 hilos: " << elapsed_time_threads.count() << " segundos" << endl;
 }
+
 void *check_grid(void *params)
 {
   parameters *data = (parameters *)params;

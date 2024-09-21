@@ -7,48 +7,39 @@
 # make priority_rr - for priority with round robin scheduling
 
 CC=gcc
-CFLAGS=-Wall
+CFLAGS=-Wall -Iinclude
+
+SRC_DIR=src
+SCHEDULERS_DIR=$(SRC_DIR)/schedulers
+
+BUILD_DIR=build
+OBJ_DIR=$(BUILD_DIR)/obj
+
+OBJ_COMMON=$(OBJ_DIR)/driver.o $(OBJ_DIR)/list.o $(OBJ_DIR)/CPU.o
+OBJ_SCHEDULERS=$(BUILD_DIR)/fcfs.o $(BUILD_DIR)/sjf.o $(BUILD_DIR)/rr.o $(BUILD_DIR)/priority.o $(BUILD_DIR)/priority_rr.o
+
+# Prevent make from deleting the object files
+.PRECIOUS: $(OBJ_DIR)/%.o $(BUILD_DIR)/%.o
+
+# Build rules for each executable
+%: $(OBJ_COMMON) $(BUILD_DIR)/%.o
+	$(CC) $(CFLAGS) -o $@ $(OBJ_COMMON) $(BUILD_DIR)/$@.o
+
+# Ensure the build directory exists
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
+
+# Ensure the object directory exists
+$(OBJ_DIR):
+	mkdir -p $(OBJ_DIR)
+
+# Pattern rule for .o files in the common source directory
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Pattern rule for .o files in the schedulers directory
+$(BUILD_DIR)/%.o: $(SCHEDULERS_DIR)/%.c | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -rf *.o
-	rm -rf fcfs
-	rm -rf sjf
-	rm -rf rr
-	rm -rf priority
-	rm -rf priority_rr
-
-rr: driver.o list.o CPU.o schedule_rr.o
-	$(CC) $(CFLAGS) -o rr driver.o schedule_rr.o list.o CPU.o
-
-sjf: driver.o list.o CPU.o schedule_sjf.o
-	$(CC) $(CFLAGS) -o sjf driver.o schedule_sjf.o list.o CPU.o
-
-fcfs: driver.o list.o CPU.o schedule_fcfs.o
-	$(CC) $(CFLAGS) -o fcfs driver.o schedule_fcfs.o list.o CPU.o
-
-priority: driver.o list.o CPU.o schedule_priority.o
-	$(CC) $(CFLAGS) -o priority driver.o schedule_priority.o list.o CPU.o
-
-schedule_fcfs.o: schedule_fcfs.c
-	$(CC) $(CFLAGS) -c schedule_fcfs.c
-
-priority_rr: driver.o list.o CPU.o schedule_priority_rr.o
-	$(CC) $(CFLAGS) -o priority_rr driver.o schedule_priority_rr.o list.o CPU.o
-
-driver.o: driver.c
-	$(CC) $(CFLAGS) -c driver.c
-
-schedule_sjf.o: schedule_sjf.c
-	$(CC) $(CFLAGS) -c schedule_sjf.c
-
-schedule_priority.o: schedule_priority.c
-	$(CC) $(CFLAGS) -c schedule_priority.c
-
-schedule_rr.o: schedule_rr.c
-	$(CC) $(CFLAGS) -c schedule_rr.c
-
-list.o: list.c list.h
-	$(CC) $(CFLAGS) -c list.c
-
-CPU.o: CPU.c cpu.h
-	$(CC) $(CFLAGS) -c CPU.c
+	rm -rf $(BUILD_DIR) fcfs sjf rr priority priority_rr
